@@ -1,0 +1,11 @@
+#!/bin/sh
+# Default MAC address for eth0. The KS8851 has no EEPROM and the device tree has no address, so without this
+# the kernel would pick a random one at every boot. This derives a stable one from the Raspberry Pi serial number:
+# locally administered (02:...), different on every board, and not anyone's real one.
+# Called from /etc/network/interfaces (pre-up). Does nothing if an address was set with set-mac.sh.
+IF=eth0
+grep -q '^[[:space:]]*hwaddress' /etc/network/interfaces && exit 0
+serial=$(sed -n 's/^Serial[[:space:]]*:[[:space:]]*//p' /proc/cpuinfo)
+[ -n "$serial" ] || exit 0
+mac=$(printf '%s' "$serial" | md5sum | cut -c1-10 | sed 's/\(..\)\(..\)\(..\)\(..\)\(..\)/02:\1:\2:\3:\4:\5/')
+ip link set dev $IF address "$mac"

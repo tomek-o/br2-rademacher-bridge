@@ -1,0 +1,14 @@
+#!/bin/sh
+# Hardware watchdog (the Pi's own, 15 s maximum). BusyBox watchdog pings it every 5 s; if the system hangs
+# hard enough that this stops, the board resets itself. Left running at shutdown on purpose, so a shutdown
+# that hangs also ends in a reset.
+case "$1" in
+    start)
+        printf "Starting watchdog: "
+        start-stop-daemon -S -q -x /sbin/watchdog -- -t 5 -T 15 /dev/watchdog
+        echo "OK"
+        ;;
+    stop|restart|reload) ;;
+    *) echo "Usage: $0 {start}" >&2; exit 1 ;;
+esac
+exit 0

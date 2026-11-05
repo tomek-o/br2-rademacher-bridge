@@ -1,0 +1,3 @@
+# username uid group gid password home shell groups comment
+# "=" prefix: plain-text password, hashed by Buildroot at build time
+tomeko -1 tomeko -1 =tomeko /home/tomeko /bin/sh audio,sudo tomeko user

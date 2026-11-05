@@ -1,0 +1,2 @@
+name: RDM_BRIDGE
+desc: Minimal Buildroot system for the Rademacher Smart2Smart bridge (Raspberry Pi Zero + KS8851 SPI Ethernet)

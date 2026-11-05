@@ -1,0 +1,64 @@
+# The Pi Zero is ARMv6 (ARM1176JZF-S): build for ARMv6 only. Without this line ARCH_MULTI_V7 defaults to y
+# and the kernel is compiled for ARMv7, which panics on the first ARMv7 instruction.
+# CONFIG_ARCH_MULTI_V7 is not set
+# Ethernet: Micrel KS8851 on SPI0
+CONFIG_NETDEVICES=y
+CONFIG_ETHERNET=y
+CONFIG_NET_VENDOR_MICREL=y
+CONFIG_KS8851=y
+CONFIG_SPI=y
+CONFIG_SPI_BCM2835=y
+CONFIG_GPIOLIB=y
+CONFIG_PINCTRL_BCM2835=y
+# Storage / filesystems
+CONFIG_MMC=y
+CONFIG_MMC_BCM2835=y
+CONFIG_EXT4_FS=y
+CONFIG_VFAT_FS=y
+CONFIG_FAT_DEFAULT_IOCHARSET="iso8859-1"
+CONFIG_NLS_CODEPAGE_437=y
+CONFIG_NLS_ISO8859_1=y
+CONFIG_DEVTMPFS=y
+CONFIG_DEVTMPFS_MOUNT=y
+CONFIG_TMPFS=y
+# Misc hardware
+CONFIG_HW_RANDOM=y
+CONFIG_HW_RANDOM_BCM2835=y
+CONFIG_BCM2835_WDT=y
+CONFIG_SERIAL_AMBA_PL011=y
+CONFIG_SERIAL_AMBA_PL011_CONSOLE=y
+CONFIG_VT=y
+CONFIG_FRAMEBUFFER_CONSOLE=y
+# LEDs on the PCB (red = heartbeat shows that the kernel is running)
+CONFIG_NEW_LEDS=y
+CONFIG_LEDS_CLASS=y
+CONFIG_LEDS_GPIO=y
+CONFIG_LEDS_TRIGGERS=y
+CONFIG_LEDS_TRIGGER_HEARTBEAT=y
+# The green LED blinks at 2 Hz during a kernel panic (panic-indicator in the device tree)
+CONFIG_LEDS_TRIGGER_PANIC=y
+# HDMI console: the VC4 display driver with framebuffer emulation (the console on tty1 comes out of the mini-HDMI
+# port). The 3D driver for newer Pis is not needed.
+CONFIG_DRM_VC4=y
+# CONFIG_DRM_V3D is not set
+# The Pi's GPU camera and audio drivers are not used on this board and load at boot through the VideoCore mailbox.
+# CONFIG_BCM2835_VCHIQ is not set
+# CONFIG_SND_BCM2835 is not set
+# CONFIG_VIDEO_BCM2835 is not set
+
+# Sound: USB audio class cards (the Pi Zero has no analog output)
+CONFIG_SOUND=y
+CONFIG_SND=y
+CONFIG_SND_USB=y
+CONFIG_SND_USB_AUDIO=y
+# CONFIG_SND_PCI is not set
+# CONFIG_SND_DRIVERS is not set
+
+# The Pi's onboard LAN chips (Pi 2/3/3B+); the Zero has neither. Other USB network drivers stay.
+# CONFIG_USB_NET_SMSC95XX is not set
+# CONFIG_USB_LAN78XX is not set
+
+# Built-in regulatory database for cfg80211 (it asks for it before the root filesystem is mounted).
+# The files are copied into the kernel tree by external.mk.
+CONFIG_EXTRA_FIRMWARE="regulatory.db regulatory.db.p7s"
+CONFIG_EXTRA_FIRMWARE_DIR="firmware"

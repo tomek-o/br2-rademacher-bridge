@@ -1,0 +1,57 @@
+--- a/fs/pstore/ram.c	2026-11-04 17:41:32.067546762 +0100
++++ b/fs/pstore/ram.c	2026-11-04 17:54:34.476165598 +0100
+@@ -720,6 +720,45 @@
+ 	return 0;
+ }
+ 
++/*
++ * Debugging aid for boards without a usable console: print the tail of the panic/oops record that pstore saved
++ * in RAM during the previous boot, at the very start of this boot, so that netconsole replays it first. It is
++ * printed at error level so that it also passes a low console loglevel (netconsole replays the log buffer, and
++ * only the first few dozen lines make it out before the next panic).
++ */
++static void ramoops_report_old_dmesg(struct ramoops_context *cxt)
++{
++	int shown = 0;
++	int i;
++
++	for (i = 0; i < cxt->max_dump_cnt && shown < 2; i++) {
++		struct persistent_ram_zone *prz = cxt->dprzs[i];
++		size_t size = prz ? persistent_ram_old_size(prz) : 0;
++		char *old = prz ? persistent_ram_old(prz) : NULL;
++		char *p, *end;
++
++		if (!old || !size)
++			continue;
++		if (size > 2560) {
++			old += size - 2560;
++			size = 2560;
++		}
++		p = old;
++		end = old + size;
++		pr_err("---- tail of previous boot, record %d ----\n", i);
++		while (p < end) {
++			char *nl = memchr(p, '\n', end - p);
++			size_t len = nl ? (size_t)(nl - p) : (size_t)(end - p);
++
++			pr_err("prev> %.*s\n", (int)len, p);
++			p += len + 1;
++		}
++		shown++;
++	}
++	if (!shown)
++		pr_err("no panic record from the previous boot\n");
++}
++
+ static int ramoops_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+@@ -865,6 +904,8 @@
+ 	ramoops_pmsg_size = pdata->pmsg_size;
+ 	ramoops_ftrace_size = pdata->ftrace_size;
+ 
++	ramoops_report_old_dmesg(cxt);
++
+ 	pr_info("using 0x%lx@0x%llx, ecc: %d\n",
+ 		cxt->size, (unsigned long long)cxt->phys_addr,
+ 		cxt->ecc_info.ecc_size);

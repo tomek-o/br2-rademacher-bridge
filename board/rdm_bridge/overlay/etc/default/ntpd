@@ -1,0 +1,2 @@
+# Servers for BusyBox ntpd (see /etc/init.d/S42ntpd). Several, so one failing does not matter.
+NTPD_SERVERS="0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org"

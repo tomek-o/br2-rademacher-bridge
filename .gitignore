@@ -1,0 +1,8 @@
+# Build products and downloads (kept outside the tree by build.sh; ignored if placed here)
+/out/
+/dl/
+/output*/
+*.img
+*.img.gz
+*.log
+*.xz

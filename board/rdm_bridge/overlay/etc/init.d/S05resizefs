@@ -1,0 +1,44 @@
+#!/bin/sh
+# Grow the root partition (mmcblk0p2) to the end of the SD card, then the ext4 filesystem.
+# Stage 1: enlarge the partition table entry and reboot.
+# Stage 2: after the reboot, run resize2fs (online) and leave a marker.
+DISK=/dev/mmcblk0
+PART=${DISK}p2
+SYS=/sys/block/mmcblk0
+MARK=/etc/.rootfs-resized
+
+case "$1" in
+    start)
+        [ -e "$MARK" ] && exit 0
+        [ -b "$PART" ] || exit 0
+
+        disk_sectors=$(cat $SYS/size)
+        p_start=$(cat $SYS/mmcblk0p2/start)
+        p_size=$(cat $SYS/mmcblk0p2/size)
+
+        # more than 4 MiB of unused space after the partition -> grow it
+        if [ $((p_start + p_size + 8192)) -lt "$disk_sectors" ]; then
+            echo "resizefs: growing ${PART} to the end of the card"
+            if echo ', +' | sfdisk --no-reread -N 2 "$DISK" >/dev/null 2>&1; then
+                sync
+                echo "resizefs: partition table updated, rebooting"
+                reboot
+                sleep 60
+            else
+                echo "resizefs: sfdisk failed, leaving the card as is" >&2
+            fi
+            exit 0
+        fi
+
+        echo "resizefs: resizing filesystem on ${PART}"
+        if resize2fs "$PART" >/dev/null 2>&1; then
+            touch "$MARK"
+            sync
+        else
+            echo "resizefs: resize2fs failed" >&2
+        fi
+        ;;
+    stop|restart|reload) ;;
+    *) echo "Usage: $0 {start}" >&2; exit 1 ;;
+esac
+exit 0

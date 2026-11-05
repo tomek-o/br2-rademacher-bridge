@@ -1,0 +1,13 @@
+#!/bin/sh
+# Called by ntpd with an event name: step, stratum, unsync, periodic.
+# The self-signed certificate made at first boot has a 1970 start date because the clock was not set yet.
+# Once the time is right, make it again (once).
+MARK=/etc/lighttpd/.cert-needs-regen
+case "$1" in
+    step|periodic)
+        if [ -e "$MARK" ] && [ "$(date +%Y)" -ge 2024 ]; then
+            /etc/init.d/S49sslcert regen
+        fi
+        ;;
+esac
+exit 0

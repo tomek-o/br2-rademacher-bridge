@@ -1,0 +1,30 @@
+#!/bin/sh
+# Create a self-signed certificate for lighttpd on first boot (EC key, so it takes about a second).
+PEM=/etc/lighttpd/server.pem
+MARK=/etc/lighttpd/.cert-needs-regen
+make_cert() {
+        echo "Generating self-signed certificate for lighttpd"
+        umask 077
+        openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes \
+            -days 3650 -subj "/CN=$(hostname)" -keyout "$PEM.key" -out "$PEM.crt" >/dev/null 2>&1 \
+            && cat "$PEM.key" "$PEM.crt" > "$PEM"
+        rm -f "$PEM.key" "$PEM.crt"
+        [ -s "$PEM" ] || { echo "certificate generation failed" >&2; rm -f "$PEM"; }
+        # No RTC: if the clock is not set yet the certificate starts in 1970; ntp-event redoes it later
+        if [ "$(date +%Y)" -lt 2024 ]; then touch "$MARK"; else rm -f "$MARK"; fi
+}
+case "$1" in
+    start)
+        [ -s "$PEM" ] && exit 0
+        make_cert
+        ;;
+    regen)
+        make_cert
+        rm -f "$MARK"
+        # init respawns it (see inittab)
+        killall lighttpd 2>/dev/null
+        ;;
+    stop|restart|reload) ;;
+    *) echo "Usage: $0 {start|regen}" >&2; exit 1 ;;
+esac
+exit 0

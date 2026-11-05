@@ -1,0 +1,24 @@
+#!/bin/sh
+# NTP client. There is no battery-backed clock, so the board starts in 1970 and ntpd sets the time
+# as soon as the network and DNS work (it retries by itself until a server answers).
+# The first big correction ("step") also triggers /usr/libexec/ntp-event.
+NTPD_SERVERS="0.pool.ntp.org 1.pool.ntp.org"
+[ -r /etc/default/ntpd ] && . /etc/default/ntpd
+PIDFILE=/var/run/ntpd.pid
+case "$1" in
+    start)
+        printf "Starting ntpd: "
+        args=""
+        for s in $NTPD_SERVERS; do args="$args -p $s"; done
+        start-stop-daemon -S -q -p "$PIDFILE" -m -b -x /usr/sbin/ntpd -- -n -S /usr/libexec/ntp-event $args
+        echo "OK"
+        ;;
+    stop)
+        printf "Stopping ntpd: "
+        start-stop-daemon -K -q -p "$PIDFILE"
+        echo "OK"
+        ;;
+    restart|reload) "$0" stop; "$0" start ;;
+    *) echo "Usage: $0 {start|stop|restart}" >&2; exit 1 ;;
+esac
+exit 0

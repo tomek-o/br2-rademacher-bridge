@@ -1,0 +1,13 @@
+# <file system>	<mount pt>	<type>	<options>	<dump>	<pass>
+# Root: no access-time updates, journal commit every 30 s instead of 5 s (fewer SD card writes).
+/dev/root	/		ext4	rw,noauto,noatime,nodiratime,commit=30	0	1
+# Boot partition (FAT) is not mounted by default; mount it by hand to update the kernel:
+#   mount -o remount,rw /boot  (after `mount /boot`)
+/dev/mmcblk0p1	/boot		vfat	noauto,ro,noatime	0	0
+proc		/proc		proc	defaults	0	0
+devpts		/dev/pts	devpts	defaults,gid=5,mode=620,ptmxmode=0666	0	0
+tmpfs		/dev/shm	tmpfs	mode=1777,nosuid,nodev	0	0
+# /tmp, /var/log, /var/cache, /var/spool and /var/tmp all live here (RAM): logs never touch the card.
+tmpfs		/tmp		tmpfs	mode=1777,nosuid,nodev,noatime,size=64m	0	0
+tmpfs		/run		tmpfs	mode=0755,nosuid,nodev,noatime,size=8m	0	0
+sysfs		/sys		sysfs	defaults	0	0

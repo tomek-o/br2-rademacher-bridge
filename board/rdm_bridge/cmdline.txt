@@ -1,0 +1,1 @@
+root=/dev/mmcblk0p2 rootwait rw rootfstype=ext4 rootflags=commit=30 console=tty1 panic=10 loglevel=4

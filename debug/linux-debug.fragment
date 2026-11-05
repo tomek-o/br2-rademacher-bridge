@@ -1,0 +1,11 @@
+# Kernel options for the debugging aids described in debug/README.md (not part of the normal build).
+# Debugging aid: kernel messages (including a panic) over UDP when "netconsole=" is on the command line
+CONFIG_NETCONSOLE=y
+CONFIG_NETPOLL=y
+# Debugging aid: mirror the console into a reserved RAM block (ramoops.* on the command line) so a boot that
+# panics can be read back after the reset (see patches/linux/0001-...patch)
+# the pstore menu is hidden unless MISC_FILESYSTEMS is on (bcm2835_defconfig turns it off)
+CONFIG_MISC_FILESYSTEMS=y
+CONFIG_PSTORE=y
+CONFIG_PSTORE_CONSOLE=y
+CONFIG_PSTORE_RAM=y

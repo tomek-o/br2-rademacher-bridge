@@ -1,0 +1,28 @@
+--- a/syscall.c
++++ b/syscall.c
+@@ -35,7 +35,25 @@
+ 
+ #ifdef __linux__
+ #include <sys/syscall.h>
++#if __has_include(<linux/openat2.h>)
+ #include <linux/openat2.h>
++#else
++/* Kernel headers older than 5.6 (the build toolchain): same definitions as linux/openat2.h. */
++#include <linux/types.h>
++struct open_how {
++	__u64 flags;
++	__u64 mode;
++	__u64 resolve;
++};
++#define RESOLVE_NO_XDEV		0x01
++#define RESOLVE_NO_MAGICLINKS	0x02
++#define RESOLVE_NO_SYMLINKS	0x04
++#define RESOLVE_BENEATH		0x08
++#define RESOLVE_IN_ROOT		0x10
++#endif
++#ifndef SYS_openat2
++#define SYS_openat2 437
++#endif
+ #endif
+ 
+ #include "ifuncs.h"

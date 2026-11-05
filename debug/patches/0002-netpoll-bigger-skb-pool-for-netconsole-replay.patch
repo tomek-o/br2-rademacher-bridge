@@ -1,0 +1,11 @@
+--- a/net/core/netpoll.c	2026-11-04 17:41:43.754714157 +0100
++++ b/net/core/netpoll.c	2026-11-04 17:41:45.043732618 +0100
+@@ -44,7 +44,7 @@
+  */
+ 
+ #define MAX_UDP_CHUNK 1460
+-#define MAX_SKBS 32
++#define MAX_SKBS 512
+ #define USEC_PER_POLL	50
+ 
+ #define MAX_SKB_SIZE							\

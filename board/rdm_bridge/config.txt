@@ -1,0 +1,10 @@
+# Raspberry Pi Zero, bridge board
+# No device_tree= line: the firmware loads bcm2835-rpi-zero.dtb by default, and that is where our device tree
+# is installed (see genimage.cfg). Loading it through device_tree= made the kernel panic on this board.
+start_file=start.elf
+fixup_file=fixup.dat
+gpu_mem=64
+kernel=zImage
+disable_splash=1
+# PL011 (ttyAMA0, GPIO14/15) is the link to the RL78 radio controller: no console on it.
+enable_uart=1
