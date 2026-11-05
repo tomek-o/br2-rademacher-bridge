@@ -1,4 +1,6 @@
-# Buildroot for the Rademacher Smart2Smart bridge
+# Buildroot for the Rademacher Start2Smart bridge
+
+https://tomeko.net/reviews/Rademacher_Start2Smart_bridge/
 
 A small Linux system for the Rademacher bridge (Raspberry Pi Zero with a KS8851 SPI Ethernet chip),
 built with Buildroot. It replaces the stock HomePilot firmware on the SD card; nothing from the stock
